@@ -14,6 +14,7 @@
 #   -R, --remove         remove a package and delete files
 #   -Q, --query          check local installed packages
 #   -F, --find           find and list packages in AUR
+#   -w, --web            open AUR package page on web browser
 #
 # Requires "package-query" from AUR:
 #    https://aur.archlinux.org/packages/package-query/
@@ -33,7 +34,7 @@ PKG="$2" # package to sync or search
 # define functions #
 
 function help {
-    head -n 16 "$0" | tail -n 11 | sed 's/# //'; }
+    head -n 17 "$0" | tail -n 12 | sed 's/# //'; }
 
 function sync {
     if [[ "$PKG" != "" ]]; then
@@ -133,6 +134,10 @@ function find {
                                                cut -c 1-${WIDTH} |
                                                sort; fi; }
 
+function web {
+    URL="https://aur.archlinux.org/packages/$PKG"
+    xdg-open "$URL"; }
+
 function as_root {
     if [[ ! $EUID -ne 0 && ! "$*" = *'--root' ]]; then
         echo -e "error: root privileges detected\nrun as '--root' to explicity bypass this warning" 1>&2
@@ -180,6 +185,10 @@ case "$ARG" in
 
     -F|--find)
         find
+        ;;
+
+    -w|--web)
+        web
         ;;
 
     *) # default
