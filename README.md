@@ -18,6 +18,7 @@ options:
   -R, --remove         remove a package and delete files
   -Q, --query          check local installed packages
   -F, --find           find and list packages in AUR
+  -w, --web            open AUR package page on web browser
 ```
 
 Package dependencies are installed from ```pacman``` and then uninstalled.
