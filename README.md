@@ -1,12 +1,12 @@
 AUR_bash
 ---
 
-A simple script in bash to interact with the Arch User Repository (AUR).
+A simple script in Bash to interact with the Arch User Repository (AUR).
 
-Arguments follow default conventions
+Arguments follow default **pacman** conventions:
 
 ```
-usage: aur {option} [package] [arg]
+usage: aur {option} [package]
 
 options:
   -S, --sync           install selected package from AUR
@@ -16,23 +16,25 @@ options:
   -Ss, --search        search for packages matching name
   -Sc, -Scc, --clean   remove uninstalled packages
   -R, --remove         remove a package and delete files
-  -Q, --query          check local installed packages
+  -Q, -Qq, --query     check local installed packages
   -F, --find           find and list packages in AUR
   -w, --web            open AUR package page on web browser
 ```
 
-Package dependencies are installed from ```pacman``` and then uninstalled.
+Build package dependencies are installed from Arch repositories and then uninstalled.
 
 ### Requirements
 
-Requires "package-query" from AUR:
+Requires **package-query** from AUR:
 > https://aur.archlinux.org/packages/package-query/
 
-To install it, run:
-> $ ./aur.sh package-query
+In order to install it, execute:
+> $ ./aur.sh -S package-query
+
+Also requires **jq** from *community* repositories.
 
 ### Current limitations
 
-* Only installs missing packages from Arch repos due to ```makepkg```.
+* Only installs missing packages from Arch repos with **makepkg**.
 
-* Only accepts a single ```package``` for now due to lazy arg parsing. ^^"
+* Only accepts a single `package` parameter for now due to lazy arg parsing. ^^"

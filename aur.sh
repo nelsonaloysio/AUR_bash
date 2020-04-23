@@ -3,7 +3,7 @@
 # A simple script in bash to interact
 # with the Arch User Repository (AUR).
 #
-# usage: aur {option} [package] [arg]
+# usage: aur {option} [package]
 # options:
 #   -S, --sync           install selected package from AUR
 #   -Su, --update        update installed packages from AUR
@@ -12,7 +12,7 @@
 #   -Ss, --search        search for packages matching name
 #   -Sc, -Scc, --clean   remove uninstalled packages
 #   -R, --remove         remove a package and delete files
-#   -Q, --query          check local installed packages
+#   -Q,, -Qq, --query    check local installed packages
 #   -F, --find           find and list packages in AUR
 #   -w, --web            open AUR package page on web browser
 #
@@ -22,46 +22,56 @@
 # To install it, run:
 #    $ ./aur.sh package-query
 
-# define user settings #
+# define user settings
 
 DIR="/home/$USER/.aur/" # default path for cloning scripts
 
-# define vars #
+# define vars
 
 ARG="$1" # argument to execute
-PKG="$2" # package to sync or search
+PKG="$2" # package from AUR
 
-# define functions #
+# define functions
 
 function help {
     head -n 17 "$0" | tail -n 12 | sed 's/# //'; }
 
 function sync {
     if [[ "$PKG" != "" ]]; then
-        [[ -d "$DIR" ]] &&   cd "$DIR"
-        [[ ! -d "$PKG" ]] && download
-        [[ -d "$PKG" ]] &&   cd "$PKG" &&
+        cd "$DIR"
+
+        [[ -d "$PKG" ]] &&
+        cd "$PKG" &&
+        git pull
+
+        [[ ! -d "$PKG" ]] &&
+        download
+
+        [[ -d "$PKG" ]] &&
+        cd "$PKG"
+
         makepkg -siCcfr --needed --asdeps
 
     else echo 'error: no target specified (use -h for help)'; fi; }
 
 function download {
     if [[ "$PKG" = "" ]]; then
-        echo 'error: missing package argument.'; exit 1
+        echo 'error: no target specified (use -h for help)'; exit 1
 
     elif [[ -d "$PKG" ]]; then
         echo "$PKG folder already exists."; exit 1
 
     else # download and check
         git clone "https://aur.archlinux.org/${PKG}.git"
-        [[ "$(ls -1a "$PKG" | wc -l)" = 3 ]] && rm -r "$PKG"; fi; }
+
+        [[ "$(ls -1a "$PKG" | wc -l)" = 3 ]] &&
+        rm -r "$PKG"; fi; }
 
 function refresh {
     echo ":: Checking AUR for updated packages..."
     package-query -Au; }
 
 function update {
-    [[ -d "$DIR" ]] &&
     cd "$DIR"
 
     echo ":: Starting AUR packages upgrade..."
@@ -69,24 +79,37 @@ function update {
     sed -i 's:aur/::;s: .*::' "$DIR/.aur"
 
     [[ "$(cat "$DIR/.aur")" = "" ]] &&
-    echo " there is nothing to do" && exit 1
+    echo " there is nothing to do" &&
+    exit 1
 
     [[ "$UPDATE" = "" ]] &&
-    printf "\nUpdate $(wc -l "$DIR/.aur" | cut -c1) packages? [Y/n] " && read UPDATE
+    printf "\nUpdate $(wc -l "$DIR/.aur" | cut -c1) packages? [Y/n] " &&
+    read UPDATE
 
     if [[ "${UPDATE,,}" = y ]]; then
-        while read line; do
-            echo -e "\nUpdating ${line}..."
-            [[ -d "$line" ]] && cd "$line" && git pull
-            [[ ! -d "$line" ]] && PKG="$line" && download
-            [[ -d "$line" ]] && cd "$line"
-            makepkg -siCcfr --noconfirm --needed --asdeps; cd ..
-            done < "$DIR/.aur"
+        while read PKG; do
+            echo -e "\nUpdating ${PKG}..."
+
+            [[ -d "$PKG" ]] &&
+            cd "$PKG" &&
+            git pull
+
+            [[ ! -d "$PKG" ]] &&
+            download
+
+            [[ -d "$PKG" ]] &&
+            cd "$PKG"
+
+            makepkg -siCcfr --noconfirm --needed --asdeps
+            cd ..
+
+        done < "$DIR/.aur"
         rm -f "$DIR/.aur"; fi; }
 
 function remove {
-    [[ -d "$DIR" ]] && cd "$DIR" &&
-    [[ -d "$PKG" ]] && rm -rf "$PKG"; }
+    cd "$DIR"
+    [[ -d "$PKG" ]] &&
+    rm -rf "$PKG"; }
 
 function clean {
     [[ "$ARG" = "-Scc" ]] &&
@@ -107,13 +130,13 @@ function clean {
 
         for i in *; do
             [[ ! "$packages" = *"$i"* || $CLEAN_ALL = true ]] &&
-                rm -rf "$i"; done; fi; }
+            rm -rf "$i"; done; fi; }
 
 function query {
     package-query -Q | grep 'local/' \
-                     | grep "$PKG" \
                      | sed 's:local/::' \
-                     | sort ; }
+                     | sort \
+                     | ( [[ "$ARG" = "-Qq" || "${PKG:0:2}" = "-q" ]] && sed 's/ .*//' || cat ); }
 
 function search {
     package-query -As --nameonly "$PKG"; }
@@ -143,7 +166,7 @@ function as_root {
         echo -e "error: root privileges detected\nrun as '--root' to explicity bypass this warning" 1>&2
         exit 1; fi; }
 
-# execute #
+# execute
 
 mkdir -p "$DIR"
 
@@ -179,7 +202,7 @@ case "$ARG" in
         remove
         ;;
 
-    -Q|--query)
+    -Q|-Qq|--query)
         query
         ;;
 
