@@ -38,3 +38,7 @@ Also requires **jq** from *community* repositories.
 * Only installs missing packages from Arch repos with **makepkg**.
 
 * Only accepts a single `package` parameter for now due to lazy arg parsing. ^^"
+
+___
+
+If you liked this, also take a look at: [packages](https://gist.github.com/nelsonaloysio/946528358678dc674c5a694b0db18a3c) (gist).
