@@ -12,7 +12,7 @@
 #   -Ss, --search        search for packages matching name
 #   -Sc, -Scc, --clean   remove uninstalled packages
 #   -R, --remove         remove a package and delete files
-#   -Q,, -Qq, --query    check local installed packages
+#   -Q, -Qq, --query     check local installed packages
 #   -F, --find           find and list packages in AUR
 #   -w, --web            open AUR package page on web browser
 #
