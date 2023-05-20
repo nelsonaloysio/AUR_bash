@@ -41,4 +41,4 @@ Also requires **jq** from *community* repositories.
 
 ___
 
-If you liked this, also take a look at: [packages](https://gist.github.com/nelsonaloysio/946528358678dc674c5a694b0db18a3c) (gist).
+If you liked this, also take a look at: [packages](https://gist.github.com/nelsonaloysio/019313a217d90d9848a3d6d264bdc315) (gist).
